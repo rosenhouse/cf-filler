@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e -u
+
+cd cf-filler
+go build -o /usr/local/bin/cf-filler .
+
+cf-filler > /tmp/creds.yml
+
+manifest_path=$PWD/fixtures/cf-deployment/cf-deployment.yml
+
+bosh-cli build-manifest --var-files=/tmp/creds.yml --var-errs $manifest_path

@@ -1,0 +1,3 @@
+[submodule "fixtures/cf-deployment"]
+	path = fixtures/cf-deployment
+	url = https://github.com/cloudfoundry/cf-deployment

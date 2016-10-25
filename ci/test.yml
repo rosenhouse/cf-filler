@@ -1,0 +1,12 @@
+---
+image_resource:
+  type: docker-image
+  source: { repository: c2cnetworking/deploy-light }
+
+platform: linux
+
+inputs:
+  - name: cf-filler
+
+run:
+  path: cf-filler/ci/test
