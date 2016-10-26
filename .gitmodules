@@ -4,3 +4,6 @@
 [submodule "vendor/gopkg.in/yaml.v2"]
 	path = vendor/gopkg.in/yaml.v2
 	url = https://github.com/go-yaml/yaml
+[submodule "vendor/github.com/square/certstrap"]
+	path = vendor/github.com/square/certstrap
+	url = https://github.com/square/certstrap
