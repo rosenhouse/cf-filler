@@ -113,37 +113,85 @@ var certSets = map[string]*CertSet{
 			},
 		},
 	},
+
+	"blobstore": &CertSet{
+		CA: &CA{
+			VarName_CA: "blobstore_tls_ca_cert",
+			CommonName: "blobstore_ca",
+		},
+		CertKeyPairs: []*CertKeyPair{
+			&CertKeyPair{
+				VarName_Cert: "blobstore_tls_cert",
+				VarName_Key:  "blobstore_tls_private_key",
+				CommonName:   "blobstore.service.cf.internal",
+			},
+		},
+	},
+
+	"consul_agent": &CertSet{
+		CA: &CA{
+			VarName_CA: "consul_agent_ca_cert",
+			CommonName: "consulCA",
+		},
+		CertKeyPairs: []*CertKeyPair{
+			&CertKeyPair{
+				VarName_Cert: "consul_agent_cert",
+				VarName_Key:  "consul_agent_agent_key",
+				CommonName:   "consul_agent",
+			},
+			&CertKeyPair{
+				VarName_Cert: "consul_agent_server_cert",
+				VarName_Key:  "consul_agent_server_key",
+				CommonName:   "server.dc1.cf.internal",
+			},
+		},
+	},
+
+	"diego_bbs": &CertSet{
+		CA: &CA{
+			VarName_CA: "diego_bbs_ca_cert",
+			CommonName: "diegoCA",
+		},
+		CertKeyPairs: []*CertKeyPair{
+			&CertKeyPair{
+				VarName_Cert: "diego_bbs_client_cert",
+				VarName_Key:  "diego_bbs_client_key",
+				CommonName:   "bbs_client",
+			},
+			&CertKeyPair{
+				VarName_Cert: "diego_bbs_server_cert",
+				VarName_Key:  "diego_bbs_server_key",
+				CommonName:   "bbs.service.cf.internal",
+			},
+		},
+	},
+
+	"loggregator": &CertSet{
+		CA: &CA{
+			VarName_CA: "loggregator_tls_ca_cert",
+			CommonName: "loggregatorCA",
+		},
+		CertKeyPairs: []*CertKeyPair{
+			&CertKeyPair{
+				VarName_Cert: "doppler_tls_server_cert",
+				VarName_Key:  "doppler_tls_server_key",
+				CommonName:   "doppler",
+			},
+			&CertKeyPair{
+				VarName_Cert: "metron_metron_agent_tls_client_cert",
+				VarName_Key:  "metron_metron_agent_tls_client_key",
+				CommonName:   "metron_agent",
+			},
+		},
+	},
 }
 
 /* TODO: add these
-
-blobstore_tls_ca_cert
-	blobstore_tls_cert
-	blobstore_tls_private_key
-
-consul_agent_ca_cert
-	consul_agent_agent_key
-	consul_agent_cert
-	consul_agent_server_cert
-	consul_agent_server_key
-
-diego_bbs_ca_cert
-	diego_bbs_client_cert
-	diego_bbs_client_key
-	diego_bbs_server_cert
-	diego_bbs_server_key
 
 diego_bbs_sql_db_connection_string
 
 diego_ssh_proxy_host_key
 diego_ssh_proxy_host_key_fingerprint
-
-loggregator_tls_ca_cert
-	doppler_tls_server_cert
-	doppler_tls_server_key
-	metron_metron_agent_tls_client_cert
-	metron_metron_agent_tls_client_key
-
 
 uaa_jwt_signing_key
 uaa_jwt_verification_key
