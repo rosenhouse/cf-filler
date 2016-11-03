@@ -77,6 +77,14 @@ func CreateVars(dnsName string) (OutputData, error) {
 		return o, fmt.Errorf("generate uaa jwt key pair: %s", err)
 	}
 
+	sshPrivateKey, sshKeyFingerprint, err := GenerateSSHKeyAndFingerprint()
+	if err != nil {
+		return o, fmt.Errorf("generate ssh creds: %s", err)
+	}
+
+	o["diego_ssh_proxy_host_key"] = sshPrivateKey
+	o["diego_ssh_proxy_host_key_fingerprint"] = sshKeyFingerprint
+
 	return o, nil
 }
 
@@ -209,7 +217,5 @@ var certSets = map[string]*CertSet{
 
 diego_bbs_sql_db_connection_string
 
-diego_ssh_proxy_host_key
-diego_ssh_proxy_host_key_fingerprint
 
 */

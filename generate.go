@@ -2,9 +2,7 @@ package main
 
 import (
 	"crypto/rsa"
-	"crypto/x509"
 	"encoding/base64"
-	"encoding/pem"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -69,36 +67,6 @@ func (o OutputData) GeneratePlainKeyPair(plainKeyPair *PlainKeyPair) error {
 	return nil
 }
 
-func encodePEM(keyBytes []byte, keyType string) string {
-	block := &pem.Block{
-		Type:  keyType,
-		Bytes: keyBytes,
-	}
-
-	return string(pem.EncodeToMemory(block))
-}
-
-const (
-	pemHeaderPrivateKey = "RSA PRIVATE KEY"
-	pemHeaderPublicKey  = "PUBLIC KEY"
-)
-
-// PrivateKeyToPEM serializes an RSA Private key into PEM format.
-func PrivateKeyToPEM(privateKey *rsa.PrivateKey) string {
-	keyBytes := x509.MarshalPKCS1PrivateKey(privateKey)
-
-	return encodePEM(keyBytes, pemHeaderPrivateKey)
-}
-
-// PublicKeyToPEM serializes an RSA Public key into PEM format.
-func PublicKeyToPEM(publicKey *rsa.PublicKey) (string, error) {
-	keyBytes, err := x509.MarshalPKIXPublicKey(publicKey)
-	if err != nil {
-		return "", err
-	}
-
-	return encodePEM(keyBytes, pemHeaderPublicKey), nil
-}
 func (o OutputData) GenerateCerts(ca *CA, certKeyPairs ...*CertKeyPair) error {
 	var err error
 	if err = ca.Init(); err != nil {
