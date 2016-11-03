@@ -2,7 +2,10 @@
 
 set -e -u
 
-cd cf-filler
+mkdir -p $GOPATH/src/github.com/rosenhouse/
+cp -a cf-filler $GOPATH/src/github.com/rosenhouse/
+cd $GOPATH/src/github.com/rosenhouse/cf-filler
+
 go build -o /usr/local/bin/cf-filler .
 
 cf-filler > /tmp/creds.yml
