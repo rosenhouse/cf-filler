@@ -184,6 +184,17 @@ var certSets = map[string]*CertSet{
 			},
 		},
 	},
+
+	"uaa": &CertSet{
+		CA: &CA{CommonName: "uaaCA"},
+		CertKeyPairs: []*CertKeyPair{
+			&CertKeyPair{
+				VarName_Cert: "uaa_sslCertificate",
+				VarName_Key:  "uaa_sslPrivateKey",
+				CommonName:   "uaa.service.cf.internal",
+			},
+		},
+	},
 }
 
 /* TODO: add these
@@ -195,8 +206,5 @@ diego_ssh_proxy_host_key_fingerprint
 
 uaa_jwt_signing_key
 uaa_jwt_verification_key
-
-uaa_sslCertificate
-uaa_sslPrivateKey
 
 */

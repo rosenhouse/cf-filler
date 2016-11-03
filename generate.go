@@ -53,9 +53,11 @@ func (o OutputData) GenerateCerts(ca *CA, certKeyPairs ...*CertKeyPair) error {
 		return fmt.Errorf("init ca: %s", err)
 	}
 
-	o[ca.VarName_CA], err = ca.CACertAsString()
-	if err != nil {
-		return err
+	if len(ca.VarName_CA) > 0 {
+		o[ca.VarName_CA], err = ca.CACertAsString()
+		if err != nil {
+			return err
+		}
 	}
 
 	for _, certKeyPair := range certKeyPairs {
