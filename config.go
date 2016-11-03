@@ -69,10 +69,13 @@ func CreateVars(dnsName string) (OutputData, error) {
 		}
 	}
 
-	o.GeneratePlainKeyPair(&PlainKeyPair{
+	err := o.GeneratePlainKeyPair(&PlainKeyPair{
 		VarName_PrivateKey: "uaa_jwt_signing_key",
 		VarName_PublicKey:  "uaa_jwt_verification_key",
 	})
+	if err != nil {
+		return o, fmt.Errorf("generate uaa jwt key pair: %s", err)
+	}
 
 	return o, nil
 }
@@ -208,8 +211,5 @@ diego_bbs_sql_db_connection_string
 
 diego_ssh_proxy_host_key
 diego_ssh_proxy_host_key_fingerprint
-
-uaa_jwt_signing_key
-uaa_jwt_verification_key
 
 */
