@@ -9,17 +9,12 @@ import (
 )
 
 func mainWithError() error {
-	var dnsBaseName string
-	flag.StringVar(&dnsBaseName, "dns-base", "example.com", "DNS base name, e.g. example.com")
-
-	var envName string
-	flag.StringVar(&envName, "env", "myenv", "Short name for environment, e.g. myenv")
+	var dnsName string
+	flag.StringVar(&dnsName, "dnsname", "myenv.example.com", "DNS name for environment")
 
 	flag.Parse()
 
-	dnsName := fmt.Sprintf("%s.%s", envName, dnsBaseName)
-
-	o, err := CreateVars(envName, dnsName)
+	o, err := CreateVars(dnsName)
 	if err != nil {
 		return fmt.Errorf("applying config: %s", err)
 	}

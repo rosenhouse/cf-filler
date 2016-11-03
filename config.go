@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func CreateVars(envName, dnsName string) (OutputData, error) {
+func CreateVars(dnsName string) (OutputData, error) {
 	o := OutputData{}
 	system_domain := dnsName
 	o["system_domain"] = system_domain
@@ -17,7 +17,7 @@ func CreateVars(envName, dnsName string) (OutputData, error) {
 	o.AddSystemComponent("blobstore", CfgNone)
 	o["blobstore_public_url"] = fmt.Sprintf("http://%s", o["blobstore_uri"])
 	o["blobstore_private_url"] = "https://blobstore.service.cf.internal:4443"
-	o["metron_agent_deployment_name"] = fmt.Sprintf("%s-cf", envName)
+	o["metron_agent_deployment_name"] = dnsName
 
 	o.GeneratePasswords(
 		"blobstore_admin_users_password",
