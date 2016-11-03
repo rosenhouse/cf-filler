@@ -69,6 +69,11 @@ func CreateVars(dnsName string) (OutputData, error) {
 		}
 	}
 
+	o.GeneratePlainKeyPair(&PlainKeyPair{
+		VarName_PrivateKey: "uaa_jwt_signing_key",
+		VarName_PublicKey:  "uaa_jwt_verification_key",
+	})
+
 	return o, nil
 }
 

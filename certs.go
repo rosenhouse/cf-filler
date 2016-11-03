@@ -28,6 +28,11 @@ type CertKeyPair struct {
 	cert *pkix.Certificate
 }
 
+type PlainKeyPair struct {
+	VarName_PublicKey  string
+	VarName_PrivateKey string
+}
+
 type exportable interface {
 	Export() ([]byte, error)
 }

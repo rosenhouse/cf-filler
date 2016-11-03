@@ -1,11 +1,16 @@
 package main
 
 import (
+	"crypto/rsa"
+	"crypto/x509"
 	"encoding/base64"
+	"encoding/pem"
 	"fmt"
 	"math/rand"
 	"strings"
 	"time"
+
+	"github.com/square/certstrap/pkix"
 )
 
 func init() {
@@ -47,6 +52,53 @@ func (o OutputData) GeneratePasswords(keynames ...string) {
 	}
 }
 
+func (o OutputData) GeneratePlainKeyPair(plainKeyPair *PlainKeyPair) error {
+	keyPair, err := pkix.CreateRSAKey(KeyBits)
+	if err != nil {
+		return fmt.Errorf("create key pair: %s", err)
+	}
+
+	private := keyPair.Private.(*rsa.PrivateKey)
+	public := private.Public().(*rsa.PublicKey)
+
+	o[plainKeyPair.VarName_PublicKey], err = PublicKeyToPEM(public)
+	if err != nil {
+		return fmt.Errorf("export public key pem: %s", err)
+	}
+	o[plainKeyPair.VarName_PrivateKey] = PrivateKeyToPEM(private)
+	return nil
+}
+
+func encodePEM(keyBytes []byte, keyType string) string {
+	block := &pem.Block{
+		Type:  keyType,
+		Bytes: keyBytes,
+	}
+
+	return string(pem.EncodeToMemory(block))
+}
+
+const (
+	pemHeaderPrivateKey = "RSA PRIVATE KEY"
+	pemHeaderPublicKey  = "PUBLIC KEY"
+)
+
+// PrivateKeyToPEM serializes an RSA Private key into PEM format.
+func PrivateKeyToPEM(privateKey *rsa.PrivateKey) string {
+	keyBytes := x509.MarshalPKCS1PrivateKey(privateKey)
+
+	return encodePEM(keyBytes, pemHeaderPrivateKey)
+}
+
+// PublicKeyToPEM serializes an RSA Public key into PEM format.
+func PublicKeyToPEM(publicKey *rsa.PublicKey) (string, error) {
+	keyBytes, err := x509.MarshalPKIXPublicKey(publicKey)
+	if err != nil {
+		return "", err
+	}
+
+	return encodePEM(keyBytes, pemHeaderPublicKey), nil
+}
 func (o OutputData) GenerateCerts(ca *CA, certKeyPairs ...*CertKeyPair) error {
 	var err error
 	if err = ca.Init(); err != nil {
