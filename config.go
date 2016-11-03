@@ -63,48 +63,92 @@ func CreateVars(dnsName string) (OutputData, error) {
 	o["nats_user"] = "nats"
 	o["router_status_user"] = "router-status"
 
-	err := o.GenerateCerts(
-		&CA{
-			VarName_CA: "etcd_ca_cert",
-			CommonName: "etcdCA",
-		},
-		&CertKeyPair{
-			VarName_Cert: "etcd_server_cert",
-			VarName_Key:  "etcd_server_key",
-			CommonName:   "etcd.service.cf.internal",
-			Domains: []string{
-				"*.etcd.service.cf.internal",
-				"etcd.service.cf.internal",
-			},
-		},
-		&CertKeyPair{
-			VarName_Cert: "etcd_client_cert",
-			VarName_Key:  "etcd_client_key",
-			CommonName:   "clientName",
-		},
-	)
-	if err != nil {
-		return o, fmt.Errorf("generate etcd server certs: %s", err)
-	}
-
-	err = o.GenerateCerts(
-		&CA{
-			VarName_CA: "etcd_peer_ca_cert",
-			CommonName: "peerCA",
-		},
-		&CertKeyPair{
-			VarName_Cert: "etcd_peer_cert",
-			VarName_Key:  "etcd_peer_key",
-			CommonName:   "etcd.service.cf.internal",
-			Domains: []string{
-				"*.etcd.service.cf.internal",
-				"etcd.service.cf.internal",
-			},
-		},
-	)
-	if err != nil {
-		return o, fmt.Errorf("generate etcd peer certs: %s", err)
+	for setName, certSet := range certSets {
+		if err := certSet.Generate(o); err != nil {
+			return o, fmt.Errorf("generate cert set '%s': %s", setName, err)
+		}
 	}
 
 	return o, nil
 }
+
+var certSets = map[string]*CertSet{
+	"etcd_servers": &CertSet{
+		CA: &CA{
+			VarName_CA: "etcd_ca_cert",
+			CommonName: "etcdCA",
+		},
+		CertKeyPairs: []*CertKeyPair{
+			&CertKeyPair{
+				VarName_Cert: "etcd_server_cert",
+				VarName_Key:  "etcd_server_key",
+				CommonName:   "etcd.service.cf.internal",
+				Domains: []string{
+					"*.etcd.service.cf.internal",
+					"etcd.service.cf.internal",
+				},
+			},
+			&CertKeyPair{
+				VarName_Cert: "etcd_client_cert",
+				VarName_Key:  "etcd_client_key",
+				CommonName:   "clientName",
+			},
+		},
+	},
+
+	"etcd_peers": &CertSet{
+		CA: &CA{
+			VarName_CA: "etcd_peer_ca_cert",
+			CommonName: "peerCA",
+		},
+		CertKeyPairs: []*CertKeyPair{
+			&CertKeyPair{
+				VarName_Cert: "etcd_peer_cert",
+				VarName_Key:  "etcd_peer_key",
+				CommonName:   "etcd.service.cf.internal",
+				Domains: []string{
+					"*.etcd.service.cf.internal",
+					"etcd.service.cf.internal",
+				},
+			},
+		},
+	},
+}
+
+/* TODO: add these
+
+blobstore_tls_ca_cert
+	blobstore_tls_cert
+	blobstore_tls_private_key
+
+consul_agent_ca_cert
+	consul_agent_agent_key
+	consul_agent_cert
+	consul_agent_server_cert
+	consul_agent_server_key
+
+diego_bbs_ca_cert
+	diego_bbs_client_cert
+	diego_bbs_client_key
+	diego_bbs_server_cert
+	diego_bbs_server_key
+
+diego_bbs_sql_db_connection_string
+
+diego_ssh_proxy_host_key
+diego_ssh_proxy_host_key_fingerprint
+
+loggregator_tls_ca_cert
+	doppler_tls_server_cert
+	doppler_tls_server_key
+	metron_metron_agent_tls_client_cert
+	metron_metron_agent_tls_client_key
+
+
+uaa_jwt_signing_key
+uaa_jwt_verification_key
+
+uaa_sslCertificate
+uaa_sslPrivateKey
+
+*/

@@ -75,3 +75,12 @@ func (o OutputData) GenerateCerts(ca *CA, certKeyPairs ...*CertKeyPair) error {
 
 	return nil
 }
+
+type CertSet struct {
+	CA           *CA
+	CertKeyPairs []*CertKeyPair
+}
+
+func (cs *CertSet) Generate(o OutputData) error {
+	return o.GenerateCerts(cs.CA, cs.CertKeyPairs...)
+}
