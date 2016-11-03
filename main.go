@@ -10,11 +10,13 @@ import (
 
 func mainWithError() error {
 	var dnsName string
-	flag.StringVar(&dnsName, "dnsname", "myenv.example.com", "DNS name for environment")
+	var mysqlHost string
+	flag.StringVar(&dnsName, "dnsname", "myenv.example.com", "DNS name for the deployment")
+	flag.StringVar(&mysqlHost, "mysqlHost", "10.0.31.193", "MySQL server host")
 
 	flag.Parse()
 
-	o, err := CreateVars(dnsName)
+	o, err := CreateVars(dnsName, mysqlHost)
 	if err != nil {
 		return fmt.Errorf("applying config: %s", err)
 	}

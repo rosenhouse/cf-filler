@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func CreateVars(dnsName string) (OutputData, error) {
+func CreateVars(dnsName, mysqlHost string) (OutputData, error) {
 	o := OutputData{}
 	system_domain := dnsName
 	o["system_domain"] = system_domain
@@ -62,6 +62,11 @@ func CreateVars(dnsName string) (OutputData, error) {
 	o["cf_mysql_mysql_seeded_databases_uaa_username"] = "uaa"
 	o["nats_user"] = "nats"
 	o["router_status_user"] = "router-status"
+
+	o["diego_bbs_sql_db_connection_string"] = fmt.Sprintf("%s:%s@tcp(%s:3306)/diego",
+		o["cf_mysql_mysql_seeded_databases_diego_username"],
+		o["cf_mysql_mysql_seeded_databases_diego_password"],
+		mysqlHost)
 
 	for setName, certSet := range certSets {
 		if err := certSet.Generate(o); err != nil {
@@ -212,10 +217,3 @@ var certSets = map[string]*CertSet{
 		},
 	},
 }
-
-/* TODO: add these
-
-diego_bbs_sql_db_connection_string
-
-
-*/
