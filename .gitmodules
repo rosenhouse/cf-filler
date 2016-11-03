@@ -7,3 +7,6 @@
 [submodule "vendor/github.com/square/certstrap"]
 	path = vendor/github.com/square/certstrap
 	url = https://github.com/square/certstrap
+[submodule "vendor/golang.org/x/crypto"]
+	path = vendor/golang.org/x/crypto
+	url = https://go.googlesource.com/crypto
