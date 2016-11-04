@@ -21,7 +21,7 @@ const (
 	CfgWithHTTPSURL
 )
 
-type OutputData map[string]string
+type OutputData map[string]interface{}
 
 func (o OutputData) AddSystemComponent(name string, cfgFlags int) {
 	sysDomain := o["system_domain"]
@@ -48,6 +48,14 @@ func (o OutputData) GeneratePasswords(keynames ...string) {
 	for _, name := range keynames {
 		o[name] = generatePassword()
 	}
+}
+
+func (o OutputData) GeneratePasswordArray(keyName string, numKeys int) {
+	var passwords []string
+	for i := 0; i < numKeys; i++ {
+		passwords = append(passwords, generatePassword())
+	}
+	o[keyName] = passwords
 }
 
 func (o OutputData) GeneratePlainKeyPair(plainKeyPair *PlainKeyPair) error {
