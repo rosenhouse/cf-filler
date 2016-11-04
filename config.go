@@ -49,9 +49,10 @@ func CreateVars(dnsName, mysqlHost string) (OutputData, error) {
 		"uaa_clients_tcp_emitter_secret",
 		"uaa_clients_tcp_router_secret",
 		"uaa_login_client_secret",
-		"consul_encrypt_keys",
 		"diego_bbs_encryption_keys_passphrase",
 	)
+
+	o.GeneratePasswordArray("consul_encrypt_keys", 1)
 
 	o["uaa_scim_users_admin_name"] = "admin"
 	o["blobstore_admin_users_username"] = "blobstore-user"
