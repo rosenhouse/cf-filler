@@ -16,12 +16,12 @@ func mainWithError() error {
 
 	flag.Parse()
 
-	o, err := CreateVars(dnsName, mysqlHost)
+	vars, err := CreateVars(dnsName, mysqlHost)
 	if err != nil {
 		return fmt.Errorf("applying config: %s", err)
 	}
 
-	outBytes, err := yaml.Marshal(o)
+	outBytes, err := yaml.Marshal(vars)
 	if err != nil {
 		return fmt.Errorf("marshaling output as yaml: %s", err)
 	}

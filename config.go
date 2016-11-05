@@ -2,11 +2,10 @@ package main
 
 import "fmt"
 
-func CreateVars(dnsName, mysqlHost string) (OutputData, error) {
-	o := OutputData{}
-	system_domain := dnsName
-	o["system_domain"] = system_domain
-	o["app_domain"] = dnsName
+func CreateVars(systemDomain, mysqlHost string) (DeploymentVars, error) {
+	o := DeploymentVars{}
+	o["system_domain"] = systemDomain
+	o["app_domain"] = systemDomain
 	o.AddSystemComponent("uaa", CfgWithSubdomainURI|CfgWithHTTPSURL)
 	o["uaa_token_url"] = fmt.Sprintf("https://%s/oauth/token", o["uaa_uri"])
 
@@ -17,7 +16,7 @@ func CreateVars(dnsName, mysqlHost string) (OutputData, error) {
 	o.AddSystemComponent("blobstore", CfgNone)
 	o["blobstore_public_url"] = fmt.Sprintf("http://%s", o["blobstore_uri"])
 	o["blobstore_private_url"] = "https://blobstore.service.cf.internal:4443"
-	o["metron_agent_deployment_name"] = dnsName
+	o["metron_agent_deployment_name"] = systemDomain
 
 	o.GeneratePasswords(
 		"blobstore_admin_users_password",
@@ -70,7 +69,7 @@ func CreateVars(dnsName, mysqlHost string) (OutputData, error) {
 		mysqlHost)
 
 	for setName, certSet := range certSets {
-		if err := certSet.Generate(o); err != nil {
+		if err := o.GenerateCerts(certSet); err != nil {
 			return o, fmt.Errorf("generate cert set '%s': %s", setName, err)
 		}
 	}
@@ -83,13 +82,10 @@ func CreateVars(dnsName, mysqlHost string) (OutputData, error) {
 		return o, fmt.Errorf("generate uaa jwt key pair: %s", err)
 	}
 
-	sshPrivateKey, sshKeyFingerprint, err := GenerateSSHKeyAndFingerprint()
+	err = o.GenerateSSHKeyAndFingerprint("diego_ssh_proxy_host_key", "diego_ssh_proxy_host_key_fingerprint")
 	if err != nil {
 		return o, fmt.Errorf("generate ssh creds: %s", err)
 	}
-
-	o["diego_ssh_proxy_host_key"] = sshPrivateKey
-	o["diego_ssh_proxy_host_key_fingerprint"] = sshKeyFingerprint
 
 	return o, nil
 }

@@ -21,9 +21,11 @@ const (
 	CfgWithHTTPSURL
 )
 
-type OutputData map[string]interface{}
+const PasswordLength = 16
 
-func (o OutputData) AddSystemComponent(name string, cfgFlags int) {
+type DeploymentVars map[string]interface{}
+
+func (o DeploymentVars) AddSystemComponent(name string, cfgFlags int) {
 	sysDomain := o["system_domain"]
 	uri := fmt.Sprintf("%s.%s", name, sysDomain)
 	o[fmt.Sprintf("%s_uri", name)] = uri
@@ -37,20 +39,20 @@ func (o OutputData) AddSystemComponent(name string, cfgFlags int) {
 }
 
 func generatePassword() string {
-	bytes := make([]byte, 16)
+	bytes := make([]byte, PasswordLength)
 	if _, err := rand.Read(bytes); err != nil {
 		panic("unable to read rand bytes: " + err.Error())
 	}
 	return strings.Trim(base64.RawURLEncoding.EncodeToString(bytes), "-_")
 }
 
-func (o OutputData) GeneratePasswords(keynames ...string) {
+func (o DeploymentVars) GeneratePasswords(keynames ...string) {
 	for _, name := range keynames {
 		o[name] = generatePassword()
 	}
 }
 
-func (o OutputData) GeneratePasswordArray(keyName string, numKeys int) {
+func (o DeploymentVars) GeneratePasswordArray(keyName string, numKeys int) {
 	var passwords []string
 	for i := 0; i < numKeys; i++ {
 		passwords = append(passwords, generatePassword())
@@ -58,7 +60,7 @@ func (o OutputData) GeneratePasswordArray(keyName string, numKeys int) {
 	o[keyName] = passwords
 }
 
-func (o OutputData) GeneratePlainKeyPair(plainKeyPair *PlainKeyPair) error {
+func (o DeploymentVars) GeneratePlainKeyPair(plainKeyPair *PlainKeyPair) error {
 	keyPair, err := pkix.CreateRSAKey(KeyBits)
 	if err != nil {
 		return fmt.Errorf("create key pair: %s", err)
@@ -75,7 +77,14 @@ func (o OutputData) GeneratePlainKeyPair(plainKeyPair *PlainKeyPair) error {
 	return nil
 }
 
-func (o OutputData) GenerateCerts(ca *CA, certKeyPairs ...*CertKeyPair) error {
+type CertSet struct {
+	CA           *CA
+	CertKeyPairs []*CertKeyPair
+}
+
+func (o DeploymentVars) GenerateCerts(certSet *CertSet) error {
+	ca := certSet.CA
+	certKeyPairs := certSet.CertKeyPairs
 	var err error
 	if err = ca.Init(); err != nil {
 		return fmt.Errorf("init ca: %s", err)
@@ -106,11 +115,13 @@ func (o OutputData) GenerateCerts(ca *CA, certKeyPairs ...*CertKeyPair) error {
 	return nil
 }
 
-type CertSet struct {
-	CA           *CA
-	CertKeyPairs []*CertKeyPair
-}
+func (o DeploymentVars) GenerateSSHKeyAndFingerprint(keyName string, fingerprintName string) error {
+	sshPrivateKey, sshKeyFingerprint, err := GenerateSSHKeyAndFingerprint()
+	if err != nil {
+		return fmt.Errorf("generate ssh key and fingerprint: %s", err)
+	}
 
-func (cs *CertSet) Generate(o OutputData) error {
-	return o.GenerateCerts(cs.CA, cs.CertKeyPairs...)
+	o[keyName] = sshPrivateKey
+	o[fingerprintName] = sshKeyFingerprint
+	return nil
 }
