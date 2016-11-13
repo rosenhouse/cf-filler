@@ -203,12 +203,12 @@ var certSets = map[string]*CertSet{
 			&CertKeyPair{
 				VarName_Cert: "loggregator_tls_doppler_cert",
 				VarName_Key:  "loggregator_tls_doppler_key",
-				CommonName:   "loggregator",
+				CommonName:   "doppler",
 			},
 			&CertKeyPair{
 				VarName_Cert: "loggregator_tls_tc_cert",
 				VarName_Key:  "loggregator_tls_tc_key",
-				CommonName:   "loggregator",
+				CommonName:   "trafficcontroller",
 			},
 		},
 	},
