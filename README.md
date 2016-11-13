@@ -8,7 +8,6 @@ OR
 
 ```
 go get github.com/rosenhouse/cf-filler
-go install github.com/rosenhouse/cf-filler
 ```
 
 
