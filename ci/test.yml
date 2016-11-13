@@ -7,6 +7,14 @@ platform: linux
 
 inputs:
   - name: cf-filler
+    path: go/src/github.com/rosenhouse/cf-filler
 
 run:
-  path: cf-filler/ci/test
+  path: bash
+  args:
+  - -c
+  - |
+    cd go/
+    export GOPATH=$PWD
+    cd src/github.com/rosenhouse/cf-filler
+    ./test

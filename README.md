@@ -15,12 +15,20 @@ go get github.com/rosenhouse/cf-filler
 ```bash
 ./cf-filler --dnsname my-env.example.com > /tmp/vars.yml
 
-bosh build-manifest --var-files=/tmp/vars.yml --var-errs ~/workspace/cf-deployment/cf-deployment.yml > /tmp/my-deployment.yml
+bosh-cli build-manifest --var-files=/tmp/vars.yml --var-errs ~/workspace/cf-deployment/cf-deployment.yml > /tmp/my-deployment.yml
 
-bosh -e my-director -d cf deploy /tmp/my-deployment.yml
+bosh-cli -e my-director -d cf deploy /tmp/my-deployment.yml
 ```
 
 ## Running the tests
-```bash
-fly -t myconcourse execute -c ci/test.yml
-```
+
+- Locally
+  ```bash
+  go get github.com/cloudfoundry/bosh-cli
+  ./test
+  ```
+
+- On a remote [Concourse](http://concourse.ci/)
+  ```bash
+  fly -t myconcourse execute -x -c ci/test.yml
+  ```

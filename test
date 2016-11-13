@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e -u
+set -o pipefail
+
+creds_path=/tmp/creds.yml
+manifest_path=$PWD/fixtures/cf-deployment/cf-deployment.yml
+bin_path=/tmp/cf-filler
+
+go build -o $bin_path
+
+$bin_path > $creds_path
+
+bosh-cli build-manifest --var-errs --var-files=$creds_path $manifest_path
