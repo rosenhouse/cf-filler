@@ -13,9 +13,9 @@ go get github.com/rosenhouse/cf-filler
 
 ## Usage
 ```bash
-./cf-filler --dnsname my-env.example.com > /tmp/vars.yml
+cf-filler --dnsname my-env.example.com > /tmp/vars.yml
 
-bosh-cli build-manifest --var-files=/tmp/vars.yml --var-errs ~/workspace/cf-deployment/cf-deployment.yml > /tmp/my-deployment.yml
+bosh-cli build-manifest --var-errs --var-file=/tmp/vars.yml cf-deployment.yml > /tmp/my-deployment.yml
 
 bosh-cli -e my-director -d cf deploy /tmp/my-deployment.yml
 ```

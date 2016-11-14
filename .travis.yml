@@ -6,5 +6,7 @@ install:
   - go get -v github.com/onsi/ginkgo/ginkgo
   - go get -v github.com/onsi/gomega
   - go get -v github.com/cloudfoundry/bosh-cli
+  - git -C $GOPATH/src/github.com/cloudfoundry/bosh-cli checkout 810c591
+  - go install github.com/cloudfoundry/bosh-cli
 
 script: ./test
