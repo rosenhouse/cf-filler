@@ -1,4 +1,4 @@
-package main
+package creds
 
 import (
 	"crypto/md5"
@@ -10,6 +10,8 @@ import (
 
 	"golang.org/x/crypto/ssh"
 )
+
+const KeyBits = 2048
 
 func encodePEM(keyBytes []byte, keyType string) string {
 	block := &pem.Block{

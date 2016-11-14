@@ -6,6 +6,8 @@ import (
 	"math/rand"
 	"strings"
 	"time"
+
+	"github.com/rosenhouse/cf-filler/creds"
 )
 
 func init() {
@@ -58,16 +60,16 @@ func (o DeploymentVars) GeneratePasswordArray(keyName string, numKeys int) {
 }
 
 func (o DeploymentVars) GeneratePlainKeyPair(plainKeyPair *PlainKeyPair) error {
-	private, public, err := GenerateRSAKeyPair()
+	private, public, err := creds.GenerateRSAKeyPair()
 	if err != nil {
 		return fmt.Errorf("create key pair: %s", err)
 	}
 
-	o[plainKeyPair.VarName_PublicKey], err = PublicKeyToPEM(public)
+	o[plainKeyPair.VarName_PublicKey], err = creds.PublicKeyToPEM(public)
 	if err != nil {
 		return fmt.Errorf("export public key pem: %s", err)
 	}
-	o[plainKeyPair.VarName_PrivateKey] = PrivateKeyToPEM(private)
+	o[plainKeyPair.VarName_PrivateKey] = creds.PrivateKeyToPEM(private)
 	return nil
 }
 
@@ -110,7 +112,7 @@ func (o DeploymentVars) GenerateCerts(certSet *CertSet) error {
 }
 
 func (o DeploymentVars) GenerateSSHKeyAndFingerprint(keyName string, fingerprintName string) error {
-	sshPrivateKey, sshKeyFingerprint, err := GenerateSSHKeyAndFingerprint()
+	sshPrivateKey, sshKeyFingerprint, err := creds.GenerateSSHKeyAndFingerprint()
 	if err != nil {
 		return fmt.Errorf("generate ssh key and fingerprint: %s", err)
 	}
