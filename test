@@ -10,6 +10,6 @@ manifest_path=$PWD/fixtures/cf-deployment/cf-deployment.yml
 
 go install github.com/rosenhouse/cf-filler
 
-cf-filler > $creds_path
+cf-filler -recipe recipe-cf-deployment.yml > $creds_path
 
 bosh-cli build-manifest --var-errs --var-file=$creds_path $manifest_path

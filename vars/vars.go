@@ -34,7 +34,8 @@ type CertKeyPair struct {
 	Domains      []string
 }
 
+// PasswordArray defines a collection of passwords
 type PasswordArray struct {
-	VarName      string
-	NumPasswords int
+	VarName string
+	Count   int
 }
