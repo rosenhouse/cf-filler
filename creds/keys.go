@@ -27,15 +27,15 @@ const (
 	pemHeaderPublicKey  = "PUBLIC KEY"
 )
 
-// PrivateKeyToPEM serializes an RSA Private key into PEM format.
-func PrivateKeyToPEM(privateKey *rsa.PrivateKey) string {
+// privateKeyToPEM serializes an RSA Private key into PEM format.
+func privateKeyToPEM(privateKey *rsa.PrivateKey) string {
 	keyBytes := x509.MarshalPKCS1PrivateKey(privateKey)
 
 	return encodePEM(keyBytes, pemHeaderPrivateKey)
 }
 
-// PublicKeyToPEM serializes an RSA Public key into PEM format.
-func PublicKeyToPEM(publicKey *rsa.PublicKey) (string, error) {
+// publicKeyToPEM serializes an RSA Public key into PEM format.
+func publicKeyToPEM(publicKey *rsa.PublicKey) (string, error) {
 	keyBytes, err := x509.MarshalPKIXPublicKey(publicKey)
 	if err != nil {
 		return "", err
@@ -44,7 +44,7 @@ func PublicKeyToPEM(publicKey *rsa.PublicKey) (string, error) {
 	return encodePEM(keyBytes, pemHeaderPublicKey), nil
 }
 
-func GenerateRSAKeyPair() (*rsa.PrivateKey, *rsa.PublicKey, error) {
+func generateRSAKeyPair() (*rsa.PrivateKey, *rsa.PublicKey, error) {
 	private, err := rsa.GenerateKey(rand.Reader, KeyBits)
 	if err != nil {
 		return nil, nil, err
@@ -54,7 +54,7 @@ func GenerateRSAKeyPair() (*rsa.PrivateKey, *rsa.PublicKey, error) {
 }
 
 // hexadecimal md5 hash grouped by 2 characters separated by colons
-func FingerprintMD5(key ssh.PublicKey) string {
+func fingerprintMD5(key ssh.PublicKey) string {
 	hash := md5.Sum(key.Marshal())
 	out := ""
 	for i := 0; i < len(hash); i++ {
@@ -66,8 +66,8 @@ func FingerprintMD5(key ssh.PublicKey) string {
 	return out
 }
 
-func GenerateSSHKeyAndFingerprint() (string, string, error) {
-	priv, pub, err := GenerateRSAKeyPair()
+func NewSSHKeyAndFingerprint() (string, string, error) {
+	priv, pub, err := generateRSAKeyPair()
 	if err != nil {
 		return "", "", fmt.Errorf("generate rsa key pair: %s", err)
 	}
@@ -77,5 +77,19 @@ func GenerateSSHKeyAndFingerprint() (string, string, error) {
 		return "", "", err
 	}
 
-	return PrivateKeyToPEM(priv), FingerprintMD5(sshPubKey), nil
+	return privateKeyToPEM(priv), fingerprintMD5(sshPubKey), nil
+}
+
+func NewRSAKeyPair() (string, string, error) {
+	private, public, err := generateRSAKeyPair()
+	if err != nil {
+		return "", "", err
+	}
+
+	publicPEM, err := publicKeyToPEM(public)
+	if err != nil {
+		return "", "", err
+	}
+	privatePEM := privateKeyToPEM(private)
+	return privatePEM, publicPEM, nil
 }

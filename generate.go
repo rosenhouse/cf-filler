@@ -60,16 +60,13 @@ func (o DeploymentVars) GeneratePasswordArray(keyName string, numKeys int) {
 }
 
 func (o DeploymentVars) GeneratePlainKeyPair(plainKeyPair *PlainKeyPair) error {
-	private, public, err := creds.GenerateRSAKeyPair()
+	private, public, err := creds.NewRSAKeyPair()
 	if err != nil {
-		return fmt.Errorf("create key pair: %s", err)
+		return fmt.Errorf("create RSA key pair: %s", err)
 	}
 
-	o[plainKeyPair.VarName_PublicKey], err = creds.PublicKeyToPEM(public)
-	if err != nil {
-		return fmt.Errorf("export public key pem: %s", err)
-	}
-	o[plainKeyPair.VarName_PrivateKey] = creds.PrivateKeyToPEM(private)
+	o[plainKeyPair.VarName_PublicKey] = public
+	o[plainKeyPair.VarName_PrivateKey] = private
 	return nil
 }
 
@@ -112,7 +109,7 @@ func (o DeploymentVars) GenerateCerts(certSet *CertSet) error {
 }
 
 func (o DeploymentVars) GenerateSSHKeyAndFingerprint(keyName string, fingerprintName string) error {
-	sshPrivateKey, sshKeyFingerprint, err := creds.GenerateSSHKeyAndFingerprint()
+	sshPrivateKey, sshKeyFingerprint, err := creds.NewSSHKeyAndFingerprint()
 	if err != nil {
 		return fmt.Errorf("generate ssh key and fingerprint: %s", err)
 	}
