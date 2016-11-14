@@ -18,8 +18,7 @@ go install github.com/cloudfoundry/bosh-cli
 ```
 
 ## Usage
-You'll need a "recipe" file that describes the variables to generate.
-The `recipe-cf-deployment.yml` in this repo has been tested with [cf-deployment](https://github.com/cloudfoundry/cf-deployment).
+You'll need a "recipe" file that describes the variables to generate.  The `recipe-cf-deployment.yml` in this repo is a good place to start:
 
 ```bash
 cf-filler -dnsname my-env.example.com -recipe recipe-cf-deployment.yml > /tmp/vars.yml
@@ -28,6 +27,8 @@ bosh-cli build-manifest --var-errs --var-file=/tmp/vars.yml cf-deployment.yml > 
 
 bosh-cli -e my-director -d cf deploy /tmp/my-deployment.yml
 ```
+
+The `recipe-cf-deployment.yml` has been tested with the version of `cf-deployment` linked to from [the fixtures directory](https://github.com/rosenhouse/cf-filler/tree/master/fixtures).  If you modify `cf-deployment` (say to add extra jobs), you may need to customize a recipe file as well.
 
 ## Running the tests
 
