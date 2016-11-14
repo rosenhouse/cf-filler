@@ -1,4 +1,6 @@
 # cf-filler
+[![Build Status](https://api.travis-ci.org/rosenhouse/cf-filler.png?branch=master)](http://travis-ci.org/rosenhouse/cf-filler)
+
 Generate variables to fill in [cf-deployment](https://github.com/cloudfoundry/cf-deployment) using the fancy new (alpha) [bosh-cli](https://github.com/cloudfoundry/bosh-cli).
 
 ## Install
@@ -10,6 +12,14 @@ OR
 go get github.com/rosenhouse/cf-filler
 ```
 
+## Note
+The latest version of the `bosh-cli` doesn't play nicely with `cf-filler`.
+
+The workaround is to use an older version
+```
+git -C $GOPATH/src/github.com/cloudfoundry/bosh-cli checkout 810c591
+go install github.com/cloudfoundry/bosh-cli
+```
 
 ## Usage
 ```bash
