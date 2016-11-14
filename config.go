@@ -11,7 +11,7 @@ func CreateVars(systemDomain, mysqlHost string) (DeploymentVars, error) {
 	o := DeploymentVars{}
 	o["system_domain"] = systemDomain
 
-	for varName, template := range systemDomainStrings {
+	for varName, template := range basicStrings {
 		o[varName] = strings.Replace(template, "((system_domain))", systemDomain, -1)
 	}
 
@@ -19,10 +19,6 @@ func CreateVars(systemDomain, mysqlHost string) (DeploymentVars, error) {
 
 	for _, pa := range passwordArrays {
 		o.GeneratePasswordArray(pa.VarName, pa.NumPasswords)
-	}
-
-	for varName, userName := range usernames {
-		o[varName] = userName
 	}
 
 	for setName, certSet := range certSets {
@@ -50,37 +46,6 @@ func CreateVars(systemDomain, mysqlHost string) (DeploymentVars, error) {
 		mysqlHost)
 
 	return o, nil
-}
-
-var systemDomainStrings = map[string]string{
-	"app_domain": "((system_domain))",
-
-	"uaa_uri":           "uaa.((system_domain))",
-	"uaa_subdomain_uri": "*.uaa.((system_domain))",
-	"uaa_url":           "https://uaa.((system_domain))",
-	"uaa_token_url":     "https://uaa.((system_domain))/oauth/token",
-
-	"login_uri":           "login.((system_domain))",
-	"login_subdomain_uri": "*.login.((system_domain))",
-
-	"api_uri": "api.((system_domain))",
-	"api_url": "https://api.((system_domain))",
-
-	"loggregator_uri":              "loggregator.((system_domain))",
-	"doppler_uri":                  "doppler.((system_domain))",
-	"doppler_subdomain_uri":        "*.doppler.((system_domain))",
-	"metron_agent_deployment_name": "((system_domain))",
-
-	"blobstore_uri":         "blobstore.((system_domain))",
-	"blobstore_public_url":  "https://blobstore.((system_domain))",
-	"blobstore_private_url": "https://blobstore.service.cf.internal:4443",
-}
-
-var passwordArrays = []*vars.PasswordArray{
-	&vars.PasswordArray{
-		VarName:      "consul_encrypt_keys",
-		NumPasswords: 1,
-	},
 }
 
 var sshKeys = []*vars.SSHKeyAndFingerprint{
@@ -232,7 +197,29 @@ var certSets = map[string]*vars.CertSet{
 	},
 }
 
-var usernames = map[string]string{
+var basicStrings = map[string]string{
+	"app_domain": "((system_domain))",
+
+	"uaa_uri":           "uaa.((system_domain))",
+	"uaa_subdomain_uri": "*.uaa.((system_domain))",
+	"uaa_url":           "https://uaa.((system_domain))",
+	"uaa_token_url":     "https://uaa.((system_domain))/oauth/token",
+
+	"login_uri":           "login.((system_domain))",
+	"login_subdomain_uri": "*.login.((system_domain))",
+
+	"api_uri": "api.((system_domain))",
+	"api_url": "https://api.((system_domain))",
+
+	"loggregator_uri":              "loggregator.((system_domain))",
+	"doppler_uri":                  "doppler.((system_domain))",
+	"doppler_subdomain_uri":        "*.doppler.((system_domain))",
+	"metron_agent_deployment_name": "((system_domain))",
+
+	"blobstore_uri":         "blobstore.((system_domain))",
+	"blobstore_public_url":  "https://blobstore.((system_domain))",
+	"blobstore_private_url": "https://blobstore.service.cf.internal:4443",
+
 	"uaa_scim_users_admin_name":                           "admin",
 	"blobstore_admin_users_username":                      "blobstore-user",
 	"cc_staging_upload_user":                              "staging_user",
@@ -275,4 +262,11 @@ var passwords = []string{
 	"uaa_clients_tcp_router_secret",
 	"uaa_login_client_secret",
 	"diego_bbs_encryption_keys_passphrase",
+}
+
+var passwordArrays = []*vars.PasswordArray{
+	&vars.PasswordArray{
+		VarName:      "consul_encrypt_keys",
+		NumPasswords: 1,
+	},
 }
