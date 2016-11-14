@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/rosenhouse/cf-filler/vars"
+)
 
 func CreateVars(systemDomain, mysqlHost string) (DeploymentVars, error) {
 	o := DeploymentVars{}
@@ -74,7 +78,7 @@ func CreateVars(systemDomain, mysqlHost string) (DeploymentVars, error) {
 		}
 	}
 
-	err := o.GeneratePlainKeyPair(&PlainKeyPair{
+	err := o.GeneratePlainKeyPair(&vars.PlainKeyPair{
 		VarName_PrivateKey: "uaa_jwt_signing_key",
 		VarName_PublicKey:  "uaa_jwt_verification_key",
 	})
@@ -90,14 +94,14 @@ func CreateVars(systemDomain, mysqlHost string) (DeploymentVars, error) {
 	return o, nil
 }
 
-var certSets = map[string]*CertSet{
-	"etcd_servers": &CertSet{
-		CA: &CA{
+var certSets = map[string]*vars.CertSet{
+	"etcd_servers": &vars.CertSet{
+		CA: &vars.CA{
 			VarName_CA: "etcd_ca_cert",
 			CommonName: "etcdCA",
 		},
-		CertKeyPairs: []*CertKeyPair{
-			&CertKeyPair{
+		CertKeyPairs: []*vars.CertKeyPair{
+			&vars.CertKeyPair{
 				VarName_Cert: "etcd_server_cert",
 				VarName_Key:  "etcd_server_key",
 				CommonName:   "etcd.service.cf.internal",
@@ -106,7 +110,7 @@ var certSets = map[string]*CertSet{
 					"etcd.service.cf.internal",
 				},
 			},
-			&CertKeyPair{
+			&vars.CertKeyPair{
 				VarName_Cert: "etcd_client_cert",
 				VarName_Key:  "etcd_client_key",
 				CommonName:   "clientName",
@@ -114,13 +118,13 @@ var certSets = map[string]*CertSet{
 		},
 	},
 
-	"etcd_peers": &CertSet{
-		CA: &CA{
+	"etcd_peers": &vars.CertSet{
+		CA: &vars.CA{
 			VarName_CA: "etcd_peer_ca_cert",
 			CommonName: "peerCA",
 		},
-		CertKeyPairs: []*CertKeyPair{
-			&CertKeyPair{
+		CertKeyPairs: []*vars.CertKeyPair{
+			&vars.CertKeyPair{
 				VarName_Cert: "etcd_peer_cert",
 				VarName_Key:  "etcd_peer_key",
 				CommonName:   "etcd.service.cf.internal",
@@ -132,13 +136,13 @@ var certSets = map[string]*CertSet{
 		},
 	},
 
-	"blobstore": &CertSet{
-		CA: &CA{
+	"blobstore": &vars.CertSet{
+		CA: &vars.CA{
 			VarName_CA: "blobstore_tls_ca_cert",
 			CommonName: "blobstore_ca",
 		},
-		CertKeyPairs: []*CertKeyPair{
-			&CertKeyPair{
+		CertKeyPairs: []*vars.CertKeyPair{
+			&vars.CertKeyPair{
 				VarName_Cert: "blobstore_tls_cert",
 				VarName_Key:  "blobstore_tls_private_key",
 				CommonName:   "blobstore.service.cf.internal",
@@ -146,18 +150,18 @@ var certSets = map[string]*CertSet{
 		},
 	},
 
-	"consul_agent": &CertSet{
-		CA: &CA{
+	"consul_agent": &vars.CertSet{
+		CA: &vars.CA{
 			VarName_CA: "consul_agent_ca_cert",
 			CommonName: "consulCA",
 		},
-		CertKeyPairs: []*CertKeyPair{
-			&CertKeyPair{
+		CertKeyPairs: []*vars.CertKeyPair{
+			&vars.CertKeyPair{
 				VarName_Cert: "consul_agent_cert",
 				VarName_Key:  "consul_agent_agent_key",
 				CommonName:   "consul_agent",
 			},
-			&CertKeyPair{
+			&vars.CertKeyPair{
 				VarName_Cert: "consul_agent_server_cert",
 				VarName_Key:  "consul_agent_server_key",
 				CommonName:   "server.dc1.cf.internal",
@@ -165,18 +169,18 @@ var certSets = map[string]*CertSet{
 		},
 	},
 
-	"diego_bbs": &CertSet{
-		CA: &CA{
+	"diego_bbs": &vars.CertSet{
+		CA: &vars.CA{
 			VarName_CA: "diego_bbs_ca_cert",
 			CommonName: "diegoCA",
 		},
-		CertKeyPairs: []*CertKeyPair{
-			&CertKeyPair{
+		CertKeyPairs: []*vars.CertKeyPair{
+			&vars.CertKeyPair{
 				VarName_Cert: "diego_bbs_client_cert",
 				VarName_Key:  "diego_bbs_client_key",
 				CommonName:   "bbs_client",
 			},
-			&CertKeyPair{
+			&vars.CertKeyPair{
 				VarName_Cert: "diego_bbs_server_cert",
 				VarName_Key:  "diego_bbs_server_key",
 				CommonName:   "bbs.service.cf.internal",
@@ -184,28 +188,28 @@ var certSets = map[string]*CertSet{
 		},
 	},
 
-	"loggregator": &CertSet{
-		CA: &CA{
+	"loggregator": &vars.CertSet{
+		CA: &vars.CA{
 			VarName_CA: "loggregator_tls_ca_cert",
 			CommonName: "loggregatorCA",
 		},
-		CertKeyPairs: []*CertKeyPair{
-			&CertKeyPair{
+		CertKeyPairs: []*vars.CertKeyPair{
+			&vars.CertKeyPair{
 				VarName_Cert: "doppler_tls_server_cert",
 				VarName_Key:  "doppler_tls_server_key",
 				CommonName:   "doppler",
 			},
-			&CertKeyPair{
+			&vars.CertKeyPair{
 				VarName_Cert: "metron_metron_agent_tls_client_cert",
 				VarName_Key:  "metron_metron_agent_tls_client_key",
 				CommonName:   "metron_agent",
 			},
-			&CertKeyPair{
+			&vars.CertKeyPair{
 				VarName_Cert: "loggregator_tls_doppler_cert",
 				VarName_Key:  "loggregator_tls_doppler_key",
 				CommonName:   "doppler",
 			},
-			&CertKeyPair{
+			&vars.CertKeyPair{
 				VarName_Cert: "loggregator_tls_tc_cert",
 				VarName_Key:  "loggregator_tls_tc_key",
 				CommonName:   "trafficcontroller",
@@ -213,10 +217,10 @@ var certSets = map[string]*CertSet{
 		},
 	},
 
-	"uaa": &CertSet{
-		CA: &CA{CommonName: "uaaCA"},
-		CertKeyPairs: []*CertKeyPair{
-			&CertKeyPair{
+	"uaa": &vars.CertSet{
+		CA: &vars.CA{CommonName: "uaaCA"},
+		CertKeyPairs: []*vars.CertKeyPair{
+			&vars.CertKeyPair{
 				VarName_Cert: "uaa_sslCertificate",
 				VarName_Key:  "uaa_sslPrivateKey",
 				CommonName:   "uaa.service.cf.internal",

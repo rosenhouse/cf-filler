@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/rosenhouse/cf-filler/creds"
+	"github.com/rosenhouse/cf-filler/vars"
 )
 
 const (
@@ -41,7 +42,7 @@ func (o DeploymentVars) GeneratePasswordArray(keyName string, numKeys int) {
 	o[keyName] = passwords
 }
 
-func (o DeploymentVars) GeneratePlainKeyPair(plainKeyPair *PlainKeyPair) error {
+func (o DeploymentVars) GeneratePlainKeyPair(plainKeyPair *vars.PlainKeyPair) error {
 	private, public, err := creds.NewRSAKeyPair()
 	if err != nil {
 		return fmt.Errorf("create RSA key pair: %s", err)
@@ -52,39 +53,37 @@ func (o DeploymentVars) GeneratePlainKeyPair(plainKeyPair *PlainKeyPair) error {
 	return nil
 }
 
-type CertSet struct {
-	CA           *CA
-	CertKeyPairs []*CertKeyPair
-}
+func (o DeploymentVars) GenerateCerts(desiredCertSet *vars.CertSet) error {
+	ca := creds.CA{
+		CommonName: desiredCertSet.CA.CommonName,
+	}
+	certKeyPairs := make([]*creds.CertKeyPair, len(desiredCertSet.CertKeyPairs))
+	for i, desiredCertKeyPair := range desiredCertSet.CertKeyPairs {
+		certKeyPairs[i] = &creds.CertKeyPair{
+			CommonName: desiredCertKeyPair.CommonName,
+			Domains:    desiredCertKeyPair.Domains,
+		}
+	}
 
-func (o DeploymentVars) GenerateCerts(certSet *CertSet) error {
-	ca := certSet.CA
-	certKeyPairs := certSet.CertKeyPairs
 	var err error
 	if err = ca.Init(); err != nil {
 		return fmt.Errorf("init ca: %s", err)
 	}
 
-	if len(ca.VarName_CA) > 0 {
-		o[ca.VarName_CA], err = ca.CACertAsString()
+	if len(desiredCertSet.CA.VarName_CA) > 0 {
+		o[desiredCertSet.CA.VarName_CA], err = ca.CACertAsString()
 		if err != nil {
 			return err
 		}
 	}
 
-	for _, certKeyPair := range certKeyPairs {
-		err = ca.InitCertKeyPair(certKeyPair)
+	for i, certKeyPair := range certKeyPairs {
+		private, cert, err := ca.NewCertKeyPair(certKeyPair)
 		if err != nil {
 			return err
 		}
-		o[certKeyPair.VarName_Cert], err = certKeyPair.CertAsString()
-		if err != nil {
-			return err
-		}
-		o[certKeyPair.VarName_Key], err = certKeyPair.PrivateKeyAsString()
-		if err != nil {
-			return err
-		}
+		o[desiredCertSet.CertKeyPairs[i].VarName_Cert] = cert
+		o[desiredCertSet.CertKeyPairs[i].VarName_Key] = private
 	}
 
 	return nil

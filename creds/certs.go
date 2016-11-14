@@ -1,4 +1,4 @@
-package main
+package creds
 
 import (
 	"fmt"
@@ -6,12 +6,10 @@ import (
 	"github.com/square/certstrap/pkix"
 )
 
-const KeyBits = 2048
 const CAExpiryYears = 10
 const HostCertExpiryYears = 2
 
 type CA struct {
-	VarName_CA string
 	CommonName string
 
 	key  *pkix.Key
@@ -19,31 +17,11 @@ type CA struct {
 }
 
 type CertKeyPair struct {
-	VarName_Cert string
-	VarName_Key  string
-	CommonName   string
-	Domains      []string
+	CommonName string
+	Domains    []string
 
 	key  *pkix.Key
 	cert *pkix.Certificate
-}
-
-type PlainKeyPair struct {
-	VarName_PublicKey  string
-	VarName_PrivateKey string
-}
-
-type exportable interface {
-	Export() ([]byte, error)
-}
-
-func asString(e exportable) (string, error) {
-	pemBytes, err := e.Export()
-	if err != nil {
-		return "", fmt.Errorf("export pem: %s", err)
-	}
-
-	return string(pemBytes), nil
 }
 
 func (ca *CA) Init() error {
@@ -62,11 +40,30 @@ func (ca *CA) Init() error {
 	return nil
 }
 
+func (ca *CA) NewCertKeyPair(certKeyPair *CertKeyPair) (string, string, error) {
+	err := ca.initCertKeyPair(certKeyPair)
+	if err != nil {
+		return "", "", err
+	}
+
+	privateBytes, err := certKeyPair.key.ExportPrivate()
+	if err != nil {
+		return "", "", fmt.Errorf("export private key: %s", err)
+	}
+
+	cert, err := asString(certKeyPair.cert)
+	if err != nil {
+		return "", "", err
+	}
+
+	return string(privateBytes), cert, nil
+}
+
 func (ca *CA) CACertAsString() (string, error) {
 	return asString(ca.cert)
 }
 
-func (ca *CA) InitCertKeyPair(certKeyPair *CertKeyPair) error {
+func (ca *CA) initCertKeyPair(certKeyPair *CertKeyPair) error {
 	var err error
 	certKeyPair.key, err = pkix.CreateRSAKey(KeyBits)
 	if err != nil {
@@ -86,15 +83,15 @@ func (ca *CA) InitCertKeyPair(certKeyPair *CertKeyPair) error {
 	return nil
 }
 
-func (kp *CertKeyPair) PrivateKeyAsString() (string, error) {
-	pemBytes, err := kp.key.ExportPrivate()
+type exportable interface {
+	Export() ([]byte, error)
+}
+
+func asString(e exportable) (string, error) {
+	pemBytes, err := e.Export()
 	if err != nil {
-		return "", fmt.Errorf("export private key: %s", err)
+		return "", fmt.Errorf("export pem: %s", err)
 	}
 
 	return string(pemBytes), nil
-}
-
-func (kp *CertKeyPair) CertAsString() (string, error) {
-	return asString(kp.cert)
 }
