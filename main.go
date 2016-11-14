@@ -17,17 +17,17 @@ func mainWithError() error {
 
 	flag.StringVar(&dnsName, "dnsname", "myenv.example.com", "DNS name for the deployment")
 	flag.StringVar(&mysqlHost, "mysqlHost", "10.0.31.193", "MySQL server host")
-	flag.StringVar(&recipePath, "recipe", "recipe-cf-deployment.yml", "Recipe file specifying vars to generate")
+	flag.StringVar(&recipePath, "recipe", "", "Recipe file specifying vars to generate")
 
 	flag.Parse()
 
-	var recipe = defaultRecipe
-	if recipePath != "" {
-		var err error
-		recipe, err = vars.LoadRecipe(recipePath)
-		if err != nil {
-			return err
-		}
+	if recipePath == "" {
+		return fmt.Errorf("missing required flag 'recipe'")
+	}
+
+	recipe, err := vars.LoadRecipe(recipePath)
+	if err != nil {
+		return err
 	}
 
 	vars, err := CreateVars(dnsName, mysqlHost, recipe)

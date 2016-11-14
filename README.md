@@ -23,7 +23,7 @@ go install github.com/cloudfoundry/bosh-cli
 
 ## Usage
 ```bash
-cf-filler --dnsname my-env.example.com > /tmp/vars.yml
+cf-filler -dnsname my-env.example.com -recipe recipe-cf-deployment.yml > /tmp/vars.yml
 
 bosh-cli build-manifest --var-errs --var-file=/tmp/vars.yml cf-deployment.yml > /tmp/my-deployment.yml
 
