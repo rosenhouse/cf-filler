@@ -25,9 +25,8 @@ func mainWithError() error {
 	if err != nil {
 		return fmt.Errorf("marshaling output as yaml: %s", err)
 	}
-	os.Stdout.Write(outBytes)
-
-	return nil
+	_, err = os.Stdout.Write(outBytes)
+	return err
 }
 
 func main() {
