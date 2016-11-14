@@ -1,26 +1,16 @@
 package main
 
 import (
-	"encoding/base64"
 	"fmt"
-	"math/rand"
-	"strings"
-	"time"
 
 	"github.com/rosenhouse/cf-filler/creds"
 )
-
-func init() {
-	rand.Seed(time.Now().Unix())
-}
 
 const (
 	CfgNone             = 0
 	CfgWithSubdomainURI = 1 << iota
 	CfgWithHTTPSURL
 )
-
-const PasswordLength = 16
 
 type DeploymentVars map[string]interface{}
 
@@ -37,24 +27,16 @@ func (o DeploymentVars) AddSystemComponent(name string, cfgFlags int) {
 	}
 }
 
-func generatePassword() string {
-	bytes := make([]byte, PasswordLength)
-	if _, err := rand.Read(bytes); err != nil {
-		panic("unable to read rand bytes: " + err.Error())
-	}
-	return strings.Trim(base64.RawURLEncoding.EncodeToString(bytes), "-_")
-}
-
 func (o DeploymentVars) GeneratePasswords(keynames ...string) {
 	for _, name := range keynames {
-		o[name] = generatePassword()
+		o[name] = creds.NewPassword()
 	}
 }
 
 func (o DeploymentVars) GeneratePasswordArray(keyName string, numKeys int) {
 	var passwords []string
 	for i := 0; i < numKeys; i++ {
-		passwords = append(passwords, generatePassword())
+		passwords = append(passwords, creds.NewPassword())
 	}
 	o[keyName] = passwords
 }
