@@ -15,19 +15,6 @@ const (
 
 type DeploymentVars map[string]interface{}
 
-func (o DeploymentVars) AddSystemComponent(name string, cfgFlags int) {
-	sysDomain := o["system_domain"]
-	uri := fmt.Sprintf("%s.%s", name, sysDomain)
-	o[fmt.Sprintf("%s_uri", name)] = uri
-
-	if cfgFlags&CfgWithSubdomainURI != 0 {
-		o[fmt.Sprintf("%s_subdomain_uri", name)] = fmt.Sprintf("*.%s", uri)
-	}
-	if cfgFlags&CfgWithHTTPSURL != 0 {
-		o[fmt.Sprintf("%s_url", name)] = fmt.Sprintf("https://%s", uri)
-	}
-}
-
 func (o DeploymentVars) GeneratePasswords(keynames ...string) {
 	for _, name := range keynames {
 		o[name] = creds.NewPassword()

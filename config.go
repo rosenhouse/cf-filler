@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/rosenhouse/cf-filler/vars"
 )
@@ -9,18 +10,10 @@ import (
 func CreateVars(systemDomain, mysqlHost string) (DeploymentVars, error) {
 	o := DeploymentVars{}
 	o["system_domain"] = systemDomain
-	o["app_domain"] = systemDomain
-	o.AddSystemComponent("uaa", CfgWithSubdomainURI|CfgWithHTTPSURL)
-	o["uaa_token_url"] = fmt.Sprintf("https://%s/oauth/token", o["uaa_uri"])
 
-	o.AddSystemComponent("login", CfgWithSubdomainURI)
-	o.AddSystemComponent("api", CfgWithHTTPSURL)
-	o.AddSystemComponent("loggregator", CfgNone)
-	o.AddSystemComponent("doppler", CfgWithSubdomainURI)
-	o.AddSystemComponent("blobstore", CfgNone)
-	o["blobstore_public_url"] = fmt.Sprintf("http://%s", o["blobstore_uri"])
-	o["blobstore_private_url"] = "https://blobstore.service.cf.internal:4443"
-	o["metron_agent_deployment_name"] = systemDomain
+	for varName, template := range systemDomainStrings {
+		o[varName] = strings.Replace(template, "((system_domain))", systemDomain, -1)
+	}
 
 	o.GeneratePasswords(passwords...)
 
@@ -57,6 +50,30 @@ func CreateVars(systemDomain, mysqlHost string) (DeploymentVars, error) {
 		mysqlHost)
 
 	return o, nil
+}
+
+var systemDomainStrings = map[string]string{
+	"app_domain": "((system_domain))",
+
+	"uaa_uri":           "uaa.((system_domain))",
+	"uaa_subdomain_uri": "*.uaa.((system_domain))",
+	"uaa_url":           "https://uaa.((system_domain))",
+	"uaa_token_url":     "https://uaa.((system_domain))/oauth/token",
+
+	"login_uri":           "login.((system_domain))",
+	"login_subdomain_uri": "*.login.((system_domain))",
+
+	"api_uri": "api.((system_domain))",
+	"api_url": "https://api.((system_domain))",
+
+	"loggregator_uri":              "loggregator.((system_domain))",
+	"doppler_uri":                  "doppler.((system_domain))",
+	"doppler_subdomain_uri":        "*.doppler.((system_domain))",
+	"metron_agent_deployment_name": "((system_domain))",
+
+	"blobstore_uri":         "blobstore.((system_domain))",
+	"blobstore_public_url":  "https://blobstore.((system_domain))",
+	"blobstore_private_url": "https://blobstore.service.cf.internal:4443",
 }
 
 var passwordArrays = []*vars.PasswordArray{
