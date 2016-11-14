@@ -13,7 +13,7 @@ go get github.com/rosenhouse/cf-filler
 ```
 
 ## Note
-The latest version of the `bosh-cli` doesn't play nicely with `cf-filler`.
+The latest version of the `bosh-cli` [doesn't play nicely](https://github.com/cloudfoundry/bosh-cli/issues/46) with `cf-filler`.
 
 The workaround is to use an older version
 ```
