@@ -22,55 +22,15 @@ func CreateVars(systemDomain, mysqlHost string) (DeploymentVars, error) {
 	o["blobstore_private_url"] = "https://blobstore.service.cf.internal:4443"
 	o["metron_agent_deployment_name"] = systemDomain
 
-	o.GeneratePasswords(
-		"blobstore_admin_users_password",
-		"blobstore_secure_link_secret",
-		"cc_bulk_api_password",
-		"cc_db_encryption_key",
-		"cc_internal_api_password",
-		"cc_staging_upload_password",
-		"cf_mysql_mysql_admin_password",
-		"cf_mysql_mysql_cluster_health_password",
-		"cf_mysql_mysql_galera_healthcheck_endpoint_password",
-		"cf_mysql_mysql_galera_healthcheck_password",
-		"cf_mysql_mysql_roadmin_password",
-		"cf_mysql_mysql_seeded_databases_cc_password",
-		"cf_mysql_mysql_seeded_databases_diego_password",
-		"cf_mysql_mysql_seeded_databases_uaa_password",
-		"nats_password",
-		"router_status_password",
-		"uaa_scim_users_admin_password",
-		"dropsonde_shared_secret",
-		"router_route_services_secret",
-		"uaa_admin_client_secret",
-		"uaa_clients_cc-routing_secret",
-		"uaa_clients_cc-service-dashboards_secret",
-		"uaa_clients_cloud_controller_username_lookup_secret",
-		"uaa_clients_doppler_secret",
-		"uaa_clients_gorouter_secret",
-		"uaa_clients_ssh-proxy_secret",
-		"uaa_clients_tcp_emitter_secret",
-		"uaa_clients_tcp_router_secret",
-		"uaa_login_client_secret",
-		"diego_bbs_encryption_keys_passphrase",
-	)
+	o.GeneratePasswords(passwords...)
 
-	o.GeneratePasswordArray("consul_encrypt_keys", 1)
+	for _, pa := range passwordArrays {
+		o.GeneratePasswordArray(pa.VarName, pa.NumPasswords)
+	}
 
-	o["uaa_scim_users_admin_name"] = "admin"
-	o["blobstore_admin_users_username"] = "blobstore-user"
-	o["cc_staging_upload_user"] = "staging_user"
-	o["cf_mysql_mysql_galera_healthcheck_endpoint_username"] = "galera_healthcheck"
-	o["cf_mysql_mysql_seeded_databases_cc_username"] = "cloud_controller"
-	o["cf_mysql_mysql_seeded_databases_diego_username"] = "diego"
-	o["cf_mysql_mysql_seeded_databases_uaa_username"] = "uaa"
-	o["nats_user"] = "nats"
-	o["router_status_user"] = "router-status"
-
-	o["diego_bbs_sql_db_connection_string"] = fmt.Sprintf("%s:%s@tcp(%s:3306)/diego",
-		o["cf_mysql_mysql_seeded_databases_diego_username"],
-		o["cf_mysql_mysql_seeded_databases_diego_password"],
-		mysqlHost)
+	for varName, userName := range usernames {
+		o[varName] = userName
+	}
 
 	for setName, certSet := range certSets {
 		if err := o.GenerateCerts(certSet); err != nil {
@@ -78,20 +38,46 @@ func CreateVars(systemDomain, mysqlHost string) (DeploymentVars, error) {
 		}
 	}
 
-	err := o.GeneratePlainKeyPair(&vars.PlainKeyPair{
-		VarName_PrivateKey: "uaa_jwt_signing_key",
-		VarName_PublicKey:  "uaa_jwt_verification_key",
-	})
-	if err != nil {
-		return o, fmt.Errorf("generate uaa jwt key pair: %s", err)
+	for _, kp := range basicKeyPairs {
+		if err := o.GenerateBasicKeyPair(kp); err != nil {
+			return o, fmt.Errorf("generate key pair: %s", err)
+		}
 	}
 
-	err = o.GenerateSSHKeyAndFingerprint("diego_ssh_proxy_host_key", "diego_ssh_proxy_host_key_fingerprint")
-	if err != nil {
-		return o, fmt.Errorf("generate ssh creds: %s", err)
+	for _, kaf := range sshKeys {
+		err := o.GenerateSSHKeyAndFingerprint(kaf.VarName_PrivateKey, kaf.VarName_Fingerprint)
+		if err != nil {
+			return o, fmt.Errorf("generate ssh creds: %s", err)
+		}
 	}
+
+	o["diego_bbs_sql_db_connection_string"] = fmt.Sprintf("%s:%s@tcp(%s:3306)/diego",
+		o["cf_mysql_mysql_seeded_databases_diego_username"],
+		o["cf_mysql_mysql_seeded_databases_diego_password"],
+		mysqlHost)
 
 	return o, nil
+}
+
+var passwordArrays = []*vars.PasswordArray{
+	&vars.PasswordArray{
+		VarName:      "consul_encrypt_keys",
+		NumPasswords: 1,
+	},
+}
+
+var sshKeys = []*vars.SSHKeyAndFingerprint{
+	&vars.SSHKeyAndFingerprint{
+		VarName_PrivateKey:  "diego_ssh_proxy_host_key",
+		VarName_Fingerprint: "diego_ssh_proxy_host_key_fingerprint",
+	},
+}
+
+var basicKeyPairs = []*vars.BasicKeyPair{
+	&vars.BasicKeyPair{
+		VarName_PrivateKey: "uaa_jwt_signing_key",
+		VarName_PublicKey:  "uaa_jwt_verification_key",
+	},
 }
 
 var certSets = map[string]*vars.CertSet{
@@ -227,4 +213,49 @@ var certSets = map[string]*vars.CertSet{
 			},
 		},
 	},
+}
+
+var usernames = map[string]string{
+	"uaa_scim_users_admin_name":                           "admin",
+	"blobstore_admin_users_username":                      "blobstore-user",
+	"cc_staging_upload_user":                              "staging_user",
+	"cf_mysql_mysql_galera_healthcheck_endpoint_username": "galera_healthcheck",
+	"cf_mysql_mysql_seeded_databases_cc_username":         "cloud_controller",
+	"cf_mysql_mysql_seeded_databases_diego_username":      "diego",
+	"cf_mysql_mysql_seeded_databases_uaa_username":        "uaa",
+	"nats_user":          "nats",
+	"router_status_user": "router-status",
+}
+
+var passwords = []string{
+	"blobstore_admin_users_password",
+	"blobstore_secure_link_secret",
+	"cc_bulk_api_password",
+	"cc_db_encryption_key",
+	"cc_internal_api_password",
+	"cc_staging_upload_password",
+	"cf_mysql_mysql_admin_password",
+	"cf_mysql_mysql_cluster_health_password",
+	"cf_mysql_mysql_galera_healthcheck_endpoint_password",
+	"cf_mysql_mysql_galera_healthcheck_password",
+	"cf_mysql_mysql_roadmin_password",
+	"cf_mysql_mysql_seeded_databases_cc_password",
+	"cf_mysql_mysql_seeded_databases_diego_password",
+	"cf_mysql_mysql_seeded_databases_uaa_password",
+	"nats_password",
+	"router_status_password",
+	"uaa_scim_users_admin_password",
+	"dropsonde_shared_secret",
+	"router_route_services_secret",
+	"uaa_admin_client_secret",
+	"uaa_clients_cc-routing_secret",
+	"uaa_clients_cc-service-dashboards_secret",
+	"uaa_clients_cloud_controller_username_lookup_secret",
+	"uaa_clients_doppler_secret",
+	"uaa_clients_gorouter_secret",
+	"uaa_clients_ssh-proxy_secret",
+	"uaa_clients_tcp_emitter_secret",
+	"uaa_clients_tcp_router_secret",
+	"uaa_login_client_secret",
+	"diego_bbs_encryption_keys_passphrase",
 }

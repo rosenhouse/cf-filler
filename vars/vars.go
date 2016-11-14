@@ -1,10 +1,16 @@
 // Package vars provides types to describe variables in cf-deployment
 package vars
 
-// PlainKeyPair defines a basic RSA public & private key pair
-type PlainKeyPair struct {
+// BasicKeyPair defines a basic RSA public & private key pair
+type BasicKeyPair struct {
 	VarName_PublicKey  string
 	VarName_PrivateKey string
+}
+
+// SSHKeyAndFingerprint defines an SSH private key and fingerprint
+type SSHKeyAndFingerprint struct {
+	VarName_PrivateKey  string
+	VarName_Fingerprint string
 }
 
 // CertSet defines a collection of certificates and keys
@@ -26,4 +32,9 @@ type CertKeyPair struct {
 	VarName_Key  string
 	CommonName   string
 	Domains      []string
+}
+
+type PasswordArray struct {
+	VarName      string
+	NumPasswords int
 }

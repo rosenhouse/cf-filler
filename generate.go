@@ -42,7 +42,7 @@ func (o DeploymentVars) GeneratePasswordArray(keyName string, numKeys int) {
 	o[keyName] = passwords
 }
 
-func (o DeploymentVars) GeneratePlainKeyPair(plainKeyPair *vars.PlainKeyPair) error {
+func (o DeploymentVars) GenerateBasicKeyPair(plainKeyPair *vars.BasicKeyPair) error {
 	private, public, err := creds.NewRSAKeyPair()
 	if err != nil {
 		return fmt.Errorf("create RSA key pair: %s", err)
