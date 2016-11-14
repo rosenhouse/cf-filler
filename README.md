@@ -4,10 +4,6 @@
 Generate variables to fill in [cf-deployment](https://github.com/cloudfoundry/cf-deployment) using the fancy new (alpha) [bosh-cli](https://github.com/cloudfoundry/bosh-cli).
 
 ## Install
-Grab [latest binary release](https://github.com/rosenhouse/cf-filler/releases) and `chmod +x`
-
-OR
-
 ```
 go get github.com/rosenhouse/cf-filler
 ```
