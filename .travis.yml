@@ -1,0 +1,10 @@
+language: go
+go:
+  - 1.7
+
+install:
+  - go get -v github.com/onsi/ginkgo/ginkgo
+  - go get -v github.com/onsi/gomega
+  - go get -v github.com/cloudfoundry/bosh-cli
+
+script: ./test
