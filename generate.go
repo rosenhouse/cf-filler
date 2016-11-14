@@ -1,14 +1,11 @@
 package main
 
 import (
-	"crypto/rsa"
 	"encoding/base64"
 	"fmt"
 	"math/rand"
 	"strings"
 	"time"
-
-	"github.com/square/certstrap/pkix"
 )
 
 func init() {
@@ -61,13 +58,10 @@ func (o DeploymentVars) GeneratePasswordArray(keyName string, numKeys int) {
 }
 
 func (o DeploymentVars) GeneratePlainKeyPair(plainKeyPair *PlainKeyPair) error {
-	keyPair, err := pkix.CreateRSAKey(KeyBits)
+	private, public, err := GenerateRSAKeyPair()
 	if err != nil {
 		return fmt.Errorf("create key pair: %s", err)
 	}
-
-	private := keyPair.Private.(*rsa.PrivateKey)
-	public := private.Public().(*rsa.PublicKey)
 
 	o[plainKeyPair.VarName_PublicKey], err = PublicKeyToPEM(public)
 	if err != nil {
