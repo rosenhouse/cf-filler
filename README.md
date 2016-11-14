@@ -18,6 +18,9 @@ go install github.com/cloudfoundry/bosh-cli
 ```
 
 ## Usage
+You'll need a "recipe" file that describes the variables to generate.
+The `recipe-cf-deployment.yml` in this repo has been tested with [cf-deployment](https://github.com/cloudfoundry/cf-deployment).
+
 ```bash
 cf-filler -dnsname my-env.example.com -recipe recipe-cf-deployment.yml > /tmp/vars.yml
 
