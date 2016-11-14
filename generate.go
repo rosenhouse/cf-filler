@@ -54,36 +54,22 @@ func (o DeploymentVars) GeneratePlainKeyPair(plainKeyPair *vars.PlainKeyPair) er
 }
 
 func (o DeploymentVars) GenerateCerts(desiredCertSet *vars.CertSet) error {
-	ca := creds.CA{
-		CommonName: desiredCertSet.CA.CommonName,
-	}
-	certKeyPairs := make([]*creds.CertKeyPair, len(desiredCertSet.CertKeyPairs))
-	for i, desiredCertKeyPair := range desiredCertSet.CertKeyPairs {
-		certKeyPairs[i] = &creds.CertKeyPair{
-			CommonName: desiredCertKeyPair.CommonName,
-			Domains:    desiredCertKeyPair.Domains,
-		}
-	}
-
-	var err error
-	if err = ca.Init(); err != nil {
+	ca, err := creds.NewCA(desiredCertSet.CA.CommonName)
+	if err != nil {
 		return fmt.Errorf("init ca: %s", err)
 	}
 
 	if len(desiredCertSet.CA.VarName_CA) > 0 {
-		o[desiredCertSet.CA.VarName_CA], err = ca.CACertAsString()
-		if err != nil {
-			return err
-		}
+		o[desiredCertSet.CA.VarName_CA] = ca.CertPEM
 	}
 
-	for i, certKeyPair := range certKeyPairs {
-		private, cert, err := ca.NewCertKeyPair(certKeyPair)
+	for _, ckp := range desiredCertSet.CertKeyPairs {
+		private, cert, err := ca.NewCertKeyPair(ckp.CommonName, ckp.Domains)
 		if err != nil {
 			return err
 		}
-		o[desiredCertSet.CertKeyPairs[i].VarName_Cert] = cert
-		o[desiredCertSet.CertKeyPairs[i].VarName_Key] = private
+		o[ckp.VarName_Cert] = cert
+		o[ckp.VarName_Key] = private
 	}
 
 	return nil
