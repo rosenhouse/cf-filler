@@ -13,4 +13,4 @@ go install github.com/rosenhouse/cf-filler
 
 cf-filler -recipe $recipe_path > $creds_path
 
-bosh-cli build-manifest --var-errs --var-file=$creds_path $manifest_path
+bosh-cli build-manifest --var-errs -l=$creds_path $manifest_path
