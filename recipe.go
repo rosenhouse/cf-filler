@@ -2,12 +2,35 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"strings"
+
+	yaml "gopkg.in/yaml.v2"
 
 	"github.com/rosenhouse/cf-filler/vars"
 )
 
-func CreateVars(systemDomain, mysqlHost string, recipe *vars.Recipe) (DeploymentVars, error) {
+type Recipe struct {
+	Strings        map[string]string            `yaml:"strings"`
+	Passwords      []string                     `yaml:"passwords"`
+	PasswordArrays []*vars.PasswordArray        `yaml:"password_arrays"`
+	SSHKeys        []*vars.SSHKeyAndFingerprint `yaml:"ssh_keys"`
+	BasicKeyPairs  []*vars.BasicKeyPair         `yaml:"basic_key_pairs"`
+	CertSets       []*vars.CertSet              `yaml:"cert_sets"`
+}
+
+func LoadRecipe(path string) (*Recipe, error) {
+	yamlBytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("reading recipe file: %s", err)
+	}
+
+	recipe := &Recipe{}
+	err = yaml.Unmarshal(yamlBytes, recipe)
+	return recipe, err
+}
+
+func (recipe *Recipe) MakeAllVars(systemDomain, mysqlHost string) (DeploymentVars, error) {
 	o := DeploymentVars{}
 	o["system_domain"] = systemDomain
 

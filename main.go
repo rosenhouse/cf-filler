@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/rosenhouse/cf-filler/vars"
-
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -25,17 +23,17 @@ func mainWithError() error {
 		return fmt.Errorf("missing required flag 'recipe'")
 	}
 
-	recipe, err := vars.LoadRecipe(recipePath)
+	recipe, err := LoadRecipe(recipePath)
 	if err != nil {
 		return err
 	}
 
-	vars, err := CreateVars(dnsName, mysqlHost, recipe)
+	allVars, err := recipe.MakeAllVars(dnsName, mysqlHost)
 	if err != nil {
 		return fmt.Errorf("applying config: %s", err)
 	}
 
-	outBytes, err := yaml.Marshal(vars)
+	outBytes, err := yaml.Marshal(allVars)
 	if err != nil {
 		return fmt.Errorf("marshaling output as yaml: %s", err)
 	}
