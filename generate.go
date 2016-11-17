@@ -7,12 +7,6 @@ import (
 	"github.com/rosenhouse/cf-filler/vars"
 )
 
-const (
-	CfgNone             = 0
-	CfgWithSubdomainURI = 1 << iota
-	CfgWithHTTPSURL
-)
-
 type DeploymentVars map[string]interface{}
 
 func (o DeploymentVars) GeneratePasswords(keynames ...string) {
