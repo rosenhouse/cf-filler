@@ -15,12 +15,12 @@ func (o DeploymentVars) GeneratePasswords(keynames ...string) {
 	}
 }
 
-func (o DeploymentVars) GeneratePasswordArray(keyName string, numKeys int) {
+func (o DeploymentVars) GeneratePasswordArray(passArray *vars.PasswordArray) {
 	var passwords []string
-	for i := 0; i < numKeys; i++ {
+	for i := 0; i < passArray.Count; i++ {
 		passwords = append(passwords, creds.NewPassword())
 	}
-	o[keyName] = passwords
+	o[passArray.VarName] = passwords
 }
 
 func (o DeploymentVars) GenerateBasicKeyPair(plainKeyPair *vars.BasicKeyPair) error {
@@ -56,13 +56,13 @@ func (o DeploymentVars) GenerateCerts(desiredCertSet *vars.CertSet) error {
 	return nil
 }
 
-func (o DeploymentVars) GenerateSSHKeyAndFingerprint(keyName string, fingerprintName string) error {
+func (o DeploymentVars) GenerateSSHKeyAndFingerprint(keyAndFingerprint *vars.SSHKeyAndFingerprint) error {
 	sshPrivateKey, sshKeyFingerprint, err := creds.NewSSHKeyAndFingerprint()
 	if err != nil {
 		return fmt.Errorf("generate ssh key and fingerprint: %s", err)
 	}
 
-	o[keyName] = sshPrivateKey
-	o[fingerprintName] = sshKeyFingerprint
+	o[keyAndFingerprint.VarName_PrivateKey] = sshPrivateKey
+	o[keyAndFingerprint.VarName_Fingerprint] = sshKeyFingerprint
 	return nil
 }

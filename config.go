@@ -18,7 +18,7 @@ func CreateVars(systemDomain, mysqlHost string, recipe *vars.Recipe) (Deployment
 	o.GeneratePasswords(recipe.Passwords...)
 
 	for _, pa := range recipe.PasswordArrays {
-		o.GeneratePasswordArray(pa.VarName, pa.Count)
+		o.GeneratePasswordArray(pa)
 	}
 
 	for _, certSet := range recipe.CertSets {
@@ -34,8 +34,7 @@ func CreateVars(systemDomain, mysqlHost string, recipe *vars.Recipe) (Deployment
 	}
 
 	for _, kaf := range recipe.SSHKeys {
-		err := o.GenerateSSHKeyAndFingerprint(kaf.VarName_PrivateKey, kaf.VarName_Fingerprint)
-		if err != nil {
+		if err := o.GenerateSSHKeyAndFingerprint(kaf); err != nil {
 			return o, fmt.Errorf("generate ssh creds: %s", err)
 		}
 	}
