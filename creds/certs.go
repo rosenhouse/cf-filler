@@ -41,6 +41,8 @@ func NewCA(commonName string) (*CA, error) {
 	return ca, nil
 }
 
+// NewCertKeyPair generates a new private key and certificate signed signed by the CA
+// The key and cert are returned in PEM format
 func (ca *CA) NewCertKeyPair(commonName string, domains []string) (string, string, error) {
 	key, err := pkix.CreateRSAKey(KeyBits)
 	if err != nil {

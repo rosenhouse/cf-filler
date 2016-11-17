@@ -66,6 +66,8 @@ func fingerprintMD5(key ssh.PublicKey) string {
 	return out
 }
 
+// NewSSHKeyAndFingerprint returns an SSH private key and the MD5 fingerprint
+// of the public key
 func NewSSHKeyAndFingerprint() (string, string, error) {
 	priv, pub, err := generateRSAKeyPair()
 	if err != nil {
@@ -80,6 +82,7 @@ func NewSSHKeyAndFingerprint() (string, string, error) {
 	return privateKeyToPEM(priv), fingerprintMD5(sshPubKey), nil
 }
 
+// NewRSAKeyPair returns a new private and public key, in PEM format
 func NewRSAKeyPair() (string, string, error) {
 	private, public, err := generateRSAKeyPair()
 	if err != nil {
