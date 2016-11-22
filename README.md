@@ -12,17 +12,21 @@ go get github.com/rosenhouse/cf-filler
 Make sure you're using `bosh-cli` v0.0.107 or higher.  Older versions [don't play nicely](https://github.com/cloudfoundry/bosh-cli/issues/46) with `cf-filler`.
 
 ## Usage
-You'll need a "recipe" file that describes the variables to generate.  The `recipe-cf-deployment.yml` in this repo is a good place to start:
+You'll need a "recipe" file that describes the variables to generate.
+At the time of this writing, `cf-deployment` [includes its own recipe](https://github.com/cloudfoundry/cf-deployment/blob/master/cf-filler/recipe-cf-deployment.yml)
+([permalink](https://github.com/cloudfoundry/cf-deployment/blob/197b32f158bd90c56a7d9b410119c551401a3108/cf-filler/recipe-cf-deployment.yml) in case that changes).
 
 ```bash
-cf-filler -dnsname my-env.example.com -recipe recipe-cf-deployment.yml > /tmp/vars.yml
+cf-filler -recipe ~/workspace/cf-deployment/recipe-cf-deployment.yml \
+          -dnsname my-env.example.com > /tmp/vars.yml
 
-bosh-cli build-manifest --var-errs --var-file=/tmp/vars.yml cf-deployment.yml > /tmp/my-deployment.yml
+bosh-cli build-manifest --var-errs --var-file=/tmp/vars.yml \
+    ~/workspace/cf-deployment/cf-filler/cf-deployment.yml > /tmp/my-deployment.yml
 
 bosh-cli -e my-director -d cf deploy /tmp/my-deployment.yml
 ```
 
-The `recipe-cf-deployment.yml` has been tested with the version of `cf-deployment` linked to from [the fixtures directory](https://github.com/rosenhouse/cf-filler/tree/master/fixtures).  If you modify `cf-deployment` (say to add extra jobs), you may need to customize a recipe file as well.
+If you modify `cf-deployment` (say to add extra jobs), you may need to customize your recipe file as well.
 
 ## Running the tests
 

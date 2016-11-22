@@ -7,7 +7,7 @@ export PATH=$PATH:$GOPATH/bin
 
 creds_path=/tmp/creds.yml
 manifest_path=$PWD/fixtures/cf-deployment/cf-deployment.yml
-recipe_path=$PWD/recipe-cf-deployment.yml
+recipe_path=$PWD/fixtures/cf-deployment/cf-filler/recipe-cf-deployment.yml
 
 go install github.com/rosenhouse/cf-filler
 
