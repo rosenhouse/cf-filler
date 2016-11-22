@@ -11,6 +11,8 @@ go get github.com/rosenhouse/cf-filler
 ## Note
 Make sure you're using `bosh-cli` v0.0.107 or higher.  Older versions [don't play nicely](https://github.com/cloudfoundry/bosh-cli/issues/46) with `cf-filler`.
 
+Also, it appears that this functionality is now built the bosh cli!  Check out [cf-deployment#24](https://github.com/cloudfoundry/cf-deployment/pull/24) for an example.
+
 ## Usage
 You'll need a "recipe" file that describes the variables to generate.
 At the time of this writing, `cf-deployment` [includes its own recipe](https://github.com/cloudfoundry/cf-deployment/blob/master/cf-filler/recipe-cf-deployment.yml)
