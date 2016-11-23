@@ -62,10 +62,5 @@ func (recipe *Recipe) MakeAllVars(systemDomain, mysqlHost string) (DeploymentVar
 		}
 	}
 
-	o["diego_bbs_sql_db_connection_string"] = fmt.Sprintf("%s:%s@tcp(%s:3306)/diego",
-		o["cf_mysql_mysql_seeded_databases_diego_username"],
-		o["cf_mysql_mysql_seeded_databases_diego_password"],
-		mysqlHost)
-
 	return o, nil
 }
