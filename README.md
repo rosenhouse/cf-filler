@@ -1,3 +1,10 @@
+# DEPRECATED
+
+Please [see the cf-deployment README](https://github.com/cloudfoundry/cf-deployment) for how to use the new `--vars-store` feature in the `bosh-cli`
+
+---
+
+
 # cf-filler
 [![Build Status](https://api.travis-ci.org/rosenhouse/cf-filler.png?branch=master)](http://travis-ci.org/rosenhouse/cf-filler)
 
